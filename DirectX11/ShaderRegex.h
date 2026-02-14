@@ -28,6 +28,7 @@ class ShaderRegexPattern {
 public:
 	pcre2_code *regex;
 	std::string replace;
+	bool global;
 
 	bool do_replace;
 

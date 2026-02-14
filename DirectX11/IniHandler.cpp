@@ -2454,7 +2454,7 @@ static bool parse_shader_regex_section_declarations(const std::wstring *section_
 	return true;
 }
 
-static bool parse_shader_regex_section_replace(const std::wstring *section_id, const std::wstring *pattern_id, ShaderRegexGroup *regex_group)
+static bool parse_shader_regex_section_replace(const std::wstring *section_id, const std::wstring *pattern_id, ShaderRegexGroup *regex_group, bool global)
 {
 	IniSectionVector *section = NULL;
 	IniSectionVector::iterator entry;
@@ -2489,6 +2489,7 @@ static bool parse_shader_regex_section_replace(const std::wstring *section_id, c
 	LogInfo("---------------------------------------------------------------------\n");
 
 	regex_pattern->do_replace = true;
+	regex_pattern->global = global;
 	return true;
 }
 
@@ -2578,10 +2579,15 @@ static void ParseShaderRegexSections()
 				}
 				break;
 			case 3:
-				if (!_wcsnicmp(subsection_names[1].c_str(), L"Pattern", 7)
-				 && !_wcsicmp(subsection_names[2].c_str(), L"Replace")) {
-					if (parse_shader_regex_section_replace(section_id, &subsection_names[1], regex_group))
-						continue;
+				if (!_wcsnicmp(subsection_names[1].c_str(), L"Pattern", 7)) {
+					auto subsection2 = subsection_names[2].c_str();
+					if (!_wcsicmp(subsection2, L"Replace")) {
+						if (parse_shader_regex_section_replace(section_id, &subsection_names[1], regex_group, false))
+							continue;
+					} else if (!_wcsicmp(subsection2, L"ReplaceGlobal")) {
+						if (parse_shader_regex_section_replace(section_id, &subsection_names[1], regex_group, true))
+							continue;
+					}
 				}
 				break;
 		}

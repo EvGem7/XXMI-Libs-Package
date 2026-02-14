@@ -133,7 +133,8 @@ static bool update_dcl_temps(std::string *asm_text, size_t new_val)
 
 ShaderRegexPattern::ShaderRegexPattern() :
 	regex(NULL),
-	do_replace(false)
+	do_replace(false),
+	global(false)
 {
 }
 
@@ -276,6 +277,9 @@ bool ShaderRegexPattern::patch(std::string *asm_text, ShaderRegexTemps *temp_reg
 	// At a minimum we want \n to be translated in the replace string,
 	// which needs extended substitution processing to be enabled:
 	options = PCRE2_SUBSTITUTE_EXTENDED;
+	if (global) {
+		options |= PCRE2_SUBSTITUTE_GLOBAL;
+	}
 
 	match_data = pcre2_match_data_create_from_pattern(regex, NULL);
 
